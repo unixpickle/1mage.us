@@ -1,0 +1,56 @@
+body {
+    background-color: #FFFFFF;
+    font-family: helvetica, arial, sans-serif;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+h1 {
+    font-size: 26px;
+    position: relative;
+    margin-top: 10px;
+    margin-bottom: 0px;
+}
+
+h3 {
+    margin: 0;
+    font-weight: normal;
+    font-size: 14px;
+    color: rgba(119,119,119,1);
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+#upload-button {
+    position: relative;
+    width: 465px;
+    height: 100px;
+    border-radius: 15px 15px 15px 15px;
+}
+
+.upload-button-regular {
+    background-color: #00ebcc;
+}
+
+#upload-label {
+    position: absolute;
+    top: calc(50% - 13px);
+    left: 0px;
+    width: 100%;
+    
+    font-size: 26px;
+}
+
+.upload-button-regular label {
+    color: #FFFFFF;
+}
+
+.upload-button-drag {
+    background-color: transparent;
+    border: 5px dashed #00ebcc;    
+}
+
+.upload-button-drag label {
+    color: #00ebcc;
+}
