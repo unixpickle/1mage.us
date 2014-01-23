@@ -38,6 +38,8 @@ main = ->
       path = path.join imageDirectory, docs[0].sequence.toString()
       res.sendfile path
   app.get '/:img', (req, res) ->
+    res.redirect '/error'
+  app.get '*', (req, res) -> res.redirect '/error'
 
   server = http.createServer app
   server.listen port
