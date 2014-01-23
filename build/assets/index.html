@@ -2,18 +2,62 @@
 <html style="width: 100%; height: 100%">
   <head>
     <title>1mage.us</title>
-    <link rel="stylesheet" type="text/css" href="style.css" />
-    <link rel="icon" type="image/png" href="icon.png">
-    <script type="text/javascript" src="jquery.js"></script>
-    <script type="text/javascript" src="script.js"></script>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="icon" type="image/png" href="/icon.png">
+    <script type="text/javascript" src="/jquery.js"></script>
+    <script type="text/javascript" src="/script.js"></script>
   </head>
-  <body>
-    <center>
-      <h1>1mage.us</h1>
-      <h3>Image hosting like never before</h3>
-      <div id="upload-button" class="upload-button-regular">
-        <label id="upload-label">Upload</label>
-      </div>
-    </center>
+  <body style="width 100%; height: 100%">
+    
+    <!-- Upload Scene -->
+    <div id="upload-scene">
+      <center>
+        <h1 class="centered-heading">1mage.us</h1>
+        <div id="upload-button" class="rounded-button">
+          <table style="width: 100%; height: 100%">
+            <tr>
+              <td>
+                <center>Upload</center>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div id="drag-box">
+          <table style="width: 100%; height: 100%">
+            <tr>
+              <td>
+                <center>Drag in Your Image</center>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </center>
+    </div>
+    
+    <!-- Error Scene -->
+    <div id="error-scene">
+      <center>
+        <h1 class="centered-heading">1mage.com</h1>
+        <h3>Woops, looks like something went wrong</h3>
+        <div id="home-button" class="rounded-button"
+             onclick="window.displayHome()">
+          <table style="width: 100%; height: 100%">
+            <tr>
+              <td>
+                <center>Take Me Home</center>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </center>
+    </div>
+    
+    <!-- Gallery Scene -->
+    <div id="gallery-scene">
+      <h1 id="gallery-heading">1mage.com</h1>
+      <center>
+        flubird birdflu
+      </center>
+    </div>
   </body>
 </html>
