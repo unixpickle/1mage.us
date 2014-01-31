@@ -1,11 +1,15 @@
-all: build/server.js build/assets/script.js
+all: build/server build/assets
 
-build/server.js:
-	coffee -c -o build source/server.coffee
+build:
+	mkdir build
 
-build/assets/script.js:
-	coffee -c -o build/assets source/script.coffee
+build/assets: build
+	mkdir build/assets
+	coffee -c -o build/assets source/assets/*.coffee
+
+build/server: build
+	mkdir build/server
+	coffee -c -o build/server source/server/*.coffee
 
 clean:
-	rm -rf build/*.js
-	rm -rf build/assets/script.js
+	rm -rf build/

@@ -5,15 +5,19 @@
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <link rel="icon" type="image/png" href="/icon.png">
     <script type="text/javascript" src="/jquery.js"></script>
+    <script type="text/javascript" src="/scene.js"></script>
+    <script type="text/javascript" src="/upload.js"></script>
+    <script type="text/javascript" src="/choose.js"></script>
+    <script type="text/javascript" src="/error.js"></script>
     <script type="text/javascript" src="/script.js"></script>
   </head>
   <body style="width 100%; height: 100%">
-    
-    <!-- Upload Scene -->
-    <div id="upload-scene">
+    <!-- Choose Scene -->
+    <div id="choose-scene">
+      <div id="dropzone"></div>
       <center>
         <h1 class="centered-heading">1mage.us</h1>
-        <div id="upload-button" class="rounded-button">
+        <div id="choose-button" class="rounded-button">
           <table style="width: 100%; height: 100%">
             <tr>
               <td>
@@ -34,13 +38,33 @@
       </center>
     </div>
     
+    <!-- Uplodaing Scene -->
+    <div id="upload-scene">
+      <div id="upload-box">
+        <center>
+          <h1 id="upload-heading">Almost done!</h1>
+        </center>
+        <canvas width="360" height="360" id="loader">
+          Error, cannot load canvas.
+        </canvas>
+        <table id="progress-table">
+          <tr style="height: 100%"><td style="height: 100%">
+            <center id="progress-value">0%</center>
+          </td></tr>
+        </table>
+      </div>
+      <div id="upload-shielder"></div>
+    </div>
+    
     <!-- Error Scene -->
     <div id="error-scene">
       <center>
         <h1 class="centered-heading">1mage.com</h1>
-        <h3>Woops, looks like something went wrong</h3>
+        <h3 id="error-message">
+          Woops, looks like something went wrong
+        </h3>
         <div id="home-button" class="rounded-button"
-             onclick="window.displayHome()">
+             onclick="window.onemage.scenes.choose.go()">
           <table style="width: 100%; height: 100%">
             <tr>
               <td>
@@ -55,9 +79,13 @@
     <!-- Gallery Scene -->
     <div id="gallery-scene">
       <h1 id="gallery-heading">1mage.com</h1>
+      <div id="left-button" onclick="window.gallery.loadNext()"></div>
       <center>
-        flubird birdflu
+        <div id="image-well">
+        </div>
       </center>
+      <div id="right-button" onclick="window.gallery.loadLast()"></div>
     </div>
+    
   </body>
 </html>
