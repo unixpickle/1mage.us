@@ -1,6 +1,6 @@
 # 1mage
 
-`1mage` is an image upload bay, written in CoffeeScript for node. To run `1mage`, simply start a `mongod` process in the background, then compile and run `1mage`:
+*1mage* is an image upload bay, written in CoffeeScript for node. To run *1mage*, simply start a `mongod` process in the background, then compile and run the server:
 
     make
     node ./build/server/server.js <port> <path>
