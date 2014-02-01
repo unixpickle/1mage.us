@@ -4,6 +4,7 @@ class ChooseScene extends window.onemage.Scene
     @_dispInt = @displayDragInterface.bind this
     @_hideInt = @hideDragInterface.bind this
     @_drop = @handleDrop.bind this
+    @_fileChanged = @fileChanged.bind this
     @interfaceVisible = false
   
   activate: ->
@@ -13,6 +14,7 @@ class ChooseScene extends window.onemage.Scene
     $(window).bind 'dragover', @_dispInt
     $('#dropzone').bind 'dragleave', @_hideInt
     $('#dropzone').bind 'drop', @_drop
+    $('#file-input').bind 'change', @_fileChanged
     $('#choose-scene').css display: 'block'
   
   deactivate: ->
@@ -20,6 +22,7 @@ class ChooseScene extends window.onemage.Scene
     $(window).unbind 'dragover', @_dispInt
     $('#dropzone').unbind 'dragleave', @_hideInt
     $('#dropzone').unbind 'drop', @_drop
+    $('#file-input').unbind 'change', @_fileChanged
     $('#choose-scene').css display: 'none'
   
   pushURL: -> history.pushState {}, '1mage.us', '/'
@@ -51,6 +54,13 @@ class ChooseScene extends window.onemage.Scene
     file = evt.dataTransfer.files[0]
     return if not file?
     window.onemage.scenes.upload.go file
+  
+  choosePressed: ->
+    $('#file-input').click()
+  
+  fileChanged: ->
+    file = $('#file-input')[0].files[0]
+    window.onemage.scenes.upload.go file if file?
 
 
 window.onemage.scenes.choose = new ChooseScene()

@@ -22,7 +22,7 @@ class UploadScene extends window.onemage.Scene
   
   includesURL: (url) -> false
   
-  pushURL: (url) ->
+  pushURL: ->
     history.pushState {}, '1mage.us', '/prog'
 
   startLoading: (file) ->
