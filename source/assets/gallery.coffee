@@ -113,7 +113,7 @@ class GalleryScene extends window.onemage.Scene
   switchToNode: (node) ->
     @pushURL()
     $('#image-well').stop()
-    $('#image-well').animate {opacity: 0}, =>
+    $('#image-well').animate {opacity: 0}, 'fast', =>
       @loadNode node
   
   loadNode: (node) ->
@@ -130,7 +130,7 @@ class GalleryScene extends window.onemage.Scene
     return if not @current
     $('#image-well').html ''
     $('#image-well').append @current.img
-    $('#image-well').animate opacity: 1
+    $('#image-well').animate {opacity: 1}, 'fast'
     @resizeImage()
 
   resizeImage: ->
