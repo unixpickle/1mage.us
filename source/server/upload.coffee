@@ -14,7 +14,7 @@ module.exports = (req, res) ->
   form = new multiparty.Form()
   form.parse req, (err, fields, _files) ->
     # _files = {key: [file1, file2], key2: [...], ...}
-    fileLists = x for _, x of _files
+    fileLists = (x for _, x of _files)
     files = []
     files = files.concat x for x in fileLists
     
