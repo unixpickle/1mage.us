@@ -23,7 +23,7 @@ class UploadScene extends window.onemage.Scene
   includesURL: (url) -> false
   
   pushURL: (url) ->
-    history.pushState {}, 'onemage.us', '/prog'
+    history.pushState {}, '1mage.us', '/prog'
 
   startLoading: (file) ->
     formData = new FormData()
@@ -33,9 +33,9 @@ class UploadScene extends window.onemage.Scene
     xhr.addEventListener 'load', (e) ->
       value = JSON.parse xhr.response
       if value.error?
-        window.onemage.scenes.error.activate()
+        window.onemage.scenes.error.go()
       else
-        window.onemage.scenes.choose.activate()
+        window.onemage.scenes.gallery.go value.identifier
     xhr.addEventListener 'progress', (e) =>
       return unless e.lengthComputable
       percent = e.loaded / e.total

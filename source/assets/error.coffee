@@ -12,6 +12,6 @@ class ErrorScene extends window.onemage.Scene
   
   includesURL: (url) -> url == '/error'
   
-  pushURL: -> history.pushState {}, 'onemage.us', '/error'
+  pushURL: -> history.pushState {}, '1mage.us', '/error'
 
 window.onemage.scenes.error = new ErrorScene()

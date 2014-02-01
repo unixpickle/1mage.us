@@ -22,7 +22,7 @@ class ChooseScene extends window.onemage.Scene
     $('#dropzone').unbind 'drop', @_drop
     $('#choose-scene').css display: 'none'
   
-  pushURL: -> history.pushState {}, 'onemage.us', '/'
+  pushURL: -> history.pushState {}, '1mage.us', '/'
   
   includesURL: (url) ->
     url is '/' or url is ''
@@ -49,6 +49,7 @@ class ChooseScene extends window.onemage.Scene
   handleDrop: (evt) ->
     @hideDragInterface evt
     file = evt.dataTransfer.files[0]
+    return if not file?
     window.onemage.scenes.upload.go file
 
 
