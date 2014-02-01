@@ -13,9 +13,11 @@ This is the express upload handler
 module.exports = (req, res) ->
   form = new multiparty.Form()
   form.parse req, (err, fields, _files) ->
+    return res.json error: 'invalid files' if not _files?
     # _files = {key: [file1, file2], key2: [...], ...}
     fileLists = (x for _, x of _files)
     files = []
+    return res.json error: 'invalid fileLists' if not fileLists?
     files = files.concat x for x in fileLists
     
     try
