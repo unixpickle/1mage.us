@@ -36,7 +36,7 @@ class UploadScene extends window.onemage.Scene
         window.onemage.scenes.error.go()
       else
         window.onemage.scenes.gallery.go value.identifier
-    xhr.addEventListener 'progress', (e) =>
+    xhr.upload.addEventListener 'progress', (e) =>
       return unless e.lengthComputable
       percent = e.loaded / e.total
       @drawProgress percent

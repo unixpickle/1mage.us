@@ -19,7 +19,9 @@ class ImageDb
         cb err if err?
         @sequence = (doc?.sequence ? -1) + 1
         cb null, @sequence
-  
+
+  latest: (cb) -> cb null, @sequence
+
   findNextLast: (sequence, cb) ->
     gtQuery = sequence: $gt: sequence
     ltQuery = sequence: $lt: sequence

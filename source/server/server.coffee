@@ -8,6 +8,7 @@ args = require './args'
 db = require './db'
 upload = require './upload'
 nextlast = require './nextlast'
+newest = require './newest'
 etc = require './etc'
 
 main = ->
@@ -28,6 +29,7 @@ main = ->
   app.post '/upload', upload
   app.get /^\/nextlast\/[0-9]+$/, nextlast
   app.get /^\/(nav\/*|error)$/, (req, res) -> res.sendHome()
+  app.get '/last', newest
   app.get '/*', etc
   app.get '*', (req, res) -> res.redirect '/error'
 
