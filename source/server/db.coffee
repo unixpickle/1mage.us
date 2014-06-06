@@ -1,4 +1,7 @@
 {MongoClient} = require 'mongodb'
+args = require './args'
+pathJoin = require('path').join
+fs = require 'fs'
 
 class ImageDb
   constructor: ->
@@ -13,23 +16,28 @@ class ImageDb
       # TODO: ensure index here for id
     
       # query for the highest sequence number
-      sorter = sequence: -1
-      cursor = @collection.find({}).sort(sorter).limit 1
-      cursor.nextObject (err, doc) =>
+      @latest (err, seq) =>
         cb err if err?
-        @sequence = (doc?.sequence ? -1) + 1
+        @sequence = seq
         cb null, @sequence
 
-  latest: (cb) -> cb null, @sequence
+  latest: (cb) ->
+    sorter = sequence: -1
+    cursor = @collection.find({}).sort(sorter).limit 1
+    cursor.nextObject (err, doc) =>
+      cursor.close()
+      cb null, (doc?.sequence ? -1)
 
   findNextLast: (sequence, cb) ->
     gtQuery = sequence: $gt: sequence
     ltQuery = sequence: $lt: sequence
     cursor = @collection.find(gtQuery).sort(sequence: 1).limit 1
     cursor.nextObject (err, gtDoc) =>
+      cursor.close()
       return cb err if err?
       cursor = @collection.find(ltQuery).sort(sequence: -1).limit 1
       cursor.nextObject (err, ltDoc) ->
+        cursor.close()
         return cb err if err?
         cb null, gtDoc?.sequence, ltDoc?.sequence
 
@@ -42,6 +50,15 @@ class ImageDb
   fetch: (sequence, cb) ->
     query = sequence: sequence
     cursor = @collection.find(query).limit 1
-    cursor.nextObject cb
+    cursor.nextObject (args...) ->
+      cursor.close()
+      cb args...
+
+  delete: (sequence, cb) ->
+    query = sequence: sequence
+    @collection.remove query, (err) ->
+      return cb err if err?
+      deletePath = pathJoin args.directory, sequence + ''
+      fs.unlink deletePath, cb
 
 module.exports = new ImageDb()

@@ -9,6 +9,7 @@ db = require './db'
 upload = require './upload'
 nextlast = require './nextlast'
 newest = require './newest'
+deletePage = require './delete'
 etc = require './etc'
 
 main = ->
@@ -30,13 +31,13 @@ main = ->
   app.get /^\/nextlast\/[0-9]+$/, nextlast
   app.get /^\/(nav\/*|error)$/, (req, res) -> res.sendHome()
   app.get '/last', newest
+  app.get '/delete', deletePage.get
+  app.post '/delete', deletePage.post
   app.get '/*', etc
   app.get '*', (req, res) -> res.redirect '/error'
 
   server = http.createServer app
   server.listen args.port
-  server.on 'listening', ->
-    console.log 'listening on port', args.port
 
 db.connect (err) ->
   if err?
