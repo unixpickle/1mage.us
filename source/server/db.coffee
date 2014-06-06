@@ -18,7 +18,7 @@ class ImageDb
       # query for the highest sequence number
       @latest (err, seq) =>
         cb err if err?
-        @sequence = seq
+        @sequence = seq + 1
         cb null, @sequence
 
   latest: (cb) ->
