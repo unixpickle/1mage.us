@@ -172,9 +172,9 @@ body {
 #image-well {
   line-height: 0;
   padding: 0px 0px 0px 0px;
-  background-color: transparent;
   display: inline-block;
   border: solid 10px white;
+  background-color: #EAEAEA;
 }
 
 .nav-button {
