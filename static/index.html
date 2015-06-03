@@ -21,7 +21,12 @@
       <input type="file" id="file-input">
       <div id="dropzone"></div>
       <center>
-        <h1 class="centered-heading">1mage.us</h1>
+        <div class="centered-heading">
+          <object height="100%" width="100%" data="/name.svg"
+                  type="image/svg+xml">
+          </object>
+        </div>
+        <br>
         <div id="choose-button" 
         onclick="window.onemage.scenes.choose.choosePressed()"
           class="rounded-button">
@@ -66,7 +71,12 @@
     <!-- Error Scene -->
     <div id="error-scene">
       <center>
-        <h1 class="centered-heading">1mage.us</h1>
+        <div class="centered-heading">
+          <object height="100%" width="100%" data="/name.svg"
+                  type="image/svg+xml">
+          </object>
+        </div>
+        <br>
         <h3 id="error-message">
           Woops, looks like something went wrong
         </h3>
@@ -94,11 +104,11 @@
       </table>
       <div id="left-button" class="nav-button" onclick="window.onemage.scenes.gallery.loadNext()"></div>
       <div id="right-button" class="nav-button" onclick="window.onemage.scenes.gallery.loadLast()"></div>
-      <h1 id="gallery-heading"
-          class="centered-heading" 
-          onclick="window.onemage.scenes.choose.go()">
-        1mage.us
-      </h1>
+      <div id="gallery-heading" onclick="window.onemage.scenes.choose.go()">
+        <object height="100%" width="100%" data="/name.svg"
+                type="image/svg+xml" style="pointer-events: none">
+        </object>
+      </div>
     </div>
     
   </body>
