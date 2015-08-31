@@ -8,6 +8,8 @@
     this._currentScene = Circle.PROMPT_SCENE;
 
     this._ants = new Ants();
+    
+    this.switchScene(Circle.ANTS_SCENE);
   }
 
   Circle.PROMPT_SCENE = 0;
@@ -55,7 +57,7 @@
       this._startTime = time;
     }
 
-    var angle = ((time - this._startTime) / 20) % 360;
+    var angle = ((time - this._startTime) / 100) % 360;
     this._setAngle(angle);
 
     this._frameRequest = window.requestAnimationFrame(this._frame.bind(this));
