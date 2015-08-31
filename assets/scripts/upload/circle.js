@@ -4,6 +4,7 @@
     this._promptScene = document.getElementById('prompt-scene');
     this._antsScene = document.getElementById('ants-scene');
     this._uploadScene = document.getElementById('upload-scene');
+    this._progressPath = document.getElementById('progress-path');
 
     this._currentScene = Circle.PROMPT_SCENE;
 
@@ -13,6 +14,23 @@
   Circle.PROMPT_SCENE = 0;
   Circle.ANTS_SCENE = 1;
   Circle.UPLOAD_SCENE = 2;
+
+  Circle.prototype.setProgress = function(progressFraction) {
+    // TODO: set a progress label of some sort.
+    
+    var radius = 0.49;
+
+    if (progressFraction >= 1) {
+      this._progressPath.setAttribute('d', 'M0.5,0.01a' + radius + ',' + radius + ' 0 1 1 0,' +
+        radius*2 + 'a' + radius + ',' + radius + ' 0 1 1 0,-' + radius*2);
+      return;
+    }
+
+    var endX = 0.5 + radius*Math.sin(progressFraction * 2 * Math.PI);
+    var endY = 0.5 + -radius*Math.cos(progressFraction * 2 * Math.PI);
+    this._progressPath.setAttribute('d', 'M0.5,0.01A' + radius + ',' + radius + ' 0 ' +
+      (progressFraction >= 0.5 ? 1 : 0) + ' 1 ' + endX + ',' + endY);
+  };
 
   Circle.prototype.switchScene = function(newScene) {
     if (newScene === this._currentScene) {
