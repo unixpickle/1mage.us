@@ -55,7 +55,7 @@
   function Ants() {
     this._frameRequest = null;
     this._startTime = null;
-    this._element = document.getElementById('ants-scene');
+    this._element = document.getElementById('ants-spinner');
   }
 
   Ants.prototype.start = function() {
