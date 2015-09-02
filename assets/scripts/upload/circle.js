@@ -5,6 +5,7 @@
     this._antsScene = document.getElementById('ants-scene');
     this._uploadScene = document.getElementById('upload-scene');
     this._progressPath = document.getElementById('progress-path');
+    this._percentageText = document.getElementById('percentage-text');
 
     this._currentScene = Circle.PROMPT_SCENE;
 
@@ -16,7 +17,7 @@
   Circle.UPLOAD_SCENE = 2;
 
   Circle.prototype.setProgress = function(progressFraction) {
-    // TODO: set a progress label of some sort.
+    this._percentageText.textContent = Math.floor(progressFraction * 100) + '%';
     
     var radius = 0.49;
 
