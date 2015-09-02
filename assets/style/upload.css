@@ -36,3 +36,9 @@ body {
 #gallery-link:hover {
   opacity: 1;
 }
+
+#file-input {
+  position: fixed;
+  pointer-events: none;
+  visibility: hidden;
+}

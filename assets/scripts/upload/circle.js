@@ -84,6 +84,7 @@
     this._element.setAttribute('transform', 'rotate(' + a.toFixed(3) + ', 0.5, 0.5)');
   };
 
+  window.Circle = Circle;
   window.addEventListener('load', function() {
     window.circle = new Circle();
   });
