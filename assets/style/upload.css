@@ -42,3 +42,7 @@ body {
   pointer-events: none;
   visibility: hidden;
 }
+
+.clickable {
+  cursor: pointer;
+}
