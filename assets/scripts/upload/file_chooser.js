@@ -7,6 +7,7 @@
 
     this._enabled = true;
     this._input = document.getElementById('file-input');
+    this._dragShield = document.getElementById('drag-shield');
     this._dragLeaveTimeout = null;
     this._registerEvents();
   }
@@ -20,6 +21,7 @@
     if (!e && this._dragLeaveTimeout !== null) {
       this._cancelDragLeaveTimeout();
     }
+    this._setShowingDragShield(false);
   };
 
   FileChooser.prototype._cancelDragLeaveTimeout = function() {
@@ -35,6 +37,7 @@
       return;
     }
     this._dragLeaveTimeout = setTimeout(function() {
+      this._setShowingDragShield(false);
       this._dragLeaveTimeout = null;
       window.circle.switchScene(window.Circle.PROMPT_SCENE);
     }.bind(this), DRAG_LEAVE_TIMEOUT);
@@ -50,6 +53,7 @@
     }
     e.preventDefault();
 
+    this._setShowingDragShield(true);
     if (this._dragLeaveTimeout !== null) {
       this._cancelDragLeaveTimeout();
     } else {
@@ -62,6 +66,7 @@
     if (!this._enabled) {
       return;
     }
+    this._setShowingDragShield(false);
     if (e.dataTransfer.files.length === 0) {
       window.circle.switchScene(window.Circle.PROMPT_SCENE);
     } else {
@@ -98,6 +103,10 @@
         this._input.click();
       }
     }.bind(this));
+  };
+  
+  FileChooser.prototype._setShowingDragShield = function(f) {
+    this._dragShield.style.display = (f ? 'block' : 'none');
   };
 
   window.FileChooser = FileChooser;
