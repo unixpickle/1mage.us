@@ -32,7 +32,7 @@
       return;
     }
     if (this._dragLeaveTimeout !== null) {
-      throw new Error('dragLeave called twice in sequence');
+      return;
     }
     this._dragLeaveTimeout = setTimeout(function() {
       this._dragLeaveTimeout = null;
