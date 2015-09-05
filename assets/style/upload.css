@@ -53,6 +53,10 @@ body {
   display: none;
 }
 
-.clickable {
+#prompt-scene:hover {
   cursor: pointer;
+}
+
+#prompt-scene:hover #prompt-background {
+  visibility: visible;
 }
