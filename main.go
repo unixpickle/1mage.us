@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 var GlobalDatabase *Database
@@ -29,9 +32,18 @@ func main() {
 		}
 	})
 
-	// TODO: catch termination interrupt and shutdown gracefully.
+	go func() {
+		if err := http.ListenAndServe(":"+os.Args[1], nil); err != nil {
+			fmt.Fprintln(os.Stderr, "Error listening and serving:", err)
+			os.Exit(1)
+		}
+	}()
 
-	if err := http.ListenAndServe(":"+os.Args[1], nil); err != nil {
-		fmt.Fprintln(os.Stderr, "Error listening and serving:", err)
-	}
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigChan
+
+	log.Print("1mage.us shutting down...")
+	GlobalDatabase.Lock()
+	os.Exit(0)
 }

@@ -50,13 +50,13 @@ type Database struct {
 // configured, this will prompt the user to setup a new database.
 func LoadDatabase(path string) (*Database, error) {
 	dbPath := filepath.Join(path, "db.json")
-	contents, err := ioutil.ReadFile(dbPath)
-	if err != nil {
-		return nil, err
-	}
+	database := Database{DirectoryPath: path, DbPath: dbPath, Images: []Image{}}
 
-	database := Database{DirectoryPath: path, DbPath: dbPath}
-	if err := json.Unmarshal(contents, &database); err != nil {
+	if contents, err := ioutil.ReadFile(dbPath); err == nil {
+		if err := json.Unmarshal(contents, &database); err != nil {
+			return nil, err
+		}
+	} else if err = database.Save(); err != nil {
 		return nil, err
 	}
 
@@ -64,6 +64,9 @@ func LoadDatabase(path string) (*Database, error) {
 		fmt.Print("Setup new password: ")
 		pass := gopass.GetPasswdMasked()
 		database.PasswordHash = HashPassword(string(pass))
+		if err := database.Save(); err != nil {
+			return nil, err
+		}
 	}
 
 	return &database, nil
