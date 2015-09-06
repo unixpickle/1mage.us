@@ -6,9 +6,18 @@ import (
 	"os"
 )
 
+var GlobalDatabase *Database
+
 func main() {
 	if len(os.Args) != 3 {
 		fmt.Fprintln(os.Stderr, "Usage: 1mage.us <port> <data dir>")
+		os.Exit(1)
+	}
+
+	var err error
+	GlobalDatabase, err = LoadDatabase(os.Args[2])
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Failed to load database:", err)
 		os.Exit(1)
 	}
 
