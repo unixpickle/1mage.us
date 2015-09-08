@@ -72,6 +72,22 @@ func LoadDatabase(path string) (*Database, error) {
 	return &database, nil
 }
 
+// Reload updates the configuration parameters by reading them from the DB file.
+// This allows the administrator to update the server's configuration while it is running.
+// This will not re-load the images and current ID from the database, since administrators
+// should have no reason to modify them by hand.
+// The database must be locked for writing.
+func (d *Database) ReloadConfig() error {
+	var newDb Database
+	if contents, err := ioutil.ReadFile(d.DbPath); err != nil {
+		return err
+	} else if err = json.Unmarshal(contents, &newDb); err != nil {
+		return err
+	}
+	d.PasswordHash = newDb.PasswordHash
+	return nil
+}
+
 // Save writes the database to the file from which it was loaded.
 // This requires that the database was locked for writing.
 func (d *Database) Save() error {

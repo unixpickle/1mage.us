@@ -39,6 +39,17 @@ func main() {
 		}
 	}()
 
+	go func() {
+		hupChan := make(chan os.Signal, 1)
+		signal.Notify(hupChan, syscall.SIGHUP)
+		for range hupChan {
+			log.Print("Reloading configuration")
+			GlobalDatabase.Lock()
+			GlobalDatabase.ReloadConfig()
+			GlobalDatabase.Unlock()
+		}
+	}()
+
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChan
