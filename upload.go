@@ -44,6 +44,24 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
+func allocateImageId() int {
+	GlobalDatabase.Lock()
+	imageId := GlobalDatabase.CurrentId
+	GlobalDatabase.CurrentId++
+	GlobalDatabase.Unlock()
+	return imageId
+}
+
+func mimeTypeForPart(part *multipart.Part) string {
+	// TODO: check the multipart header to see if the browser provides a MIME type
+	ext := path.Ext(part.FileName())
+	mimeType = mime.TypeByExtension(ext)
+	if mimeType == "" {
+		mimeType = "image/jpeg"
+	}
+	return mimeType
+}
+
 func sendUploadError(w http.ResponseWriter, r *http.Request, errStr string) {
 	log.Print("Error from " + r.RemoteAddr + ": " + errStr)
 	packet := map[string]string{"error": errStr}
@@ -52,6 +70,14 @@ func sendUploadError(w http.ResponseWriter, r *http.Request, errStr string) {
 }
 
 func uploadImage(part *multipart.Part) (int, error) {
-	// TODO: read the image, generate the thumbnail, add it to the DB, and return the new ID.
+	mimeType := mimeTypeForPart(part)
+	imageId := allocateImageId()
+
+	// TODO: write image to file (capping at a limit size).
+	// TODO: read image file to generate thumbnail.
+	// TODO: write thumbnail file.
+	// TODO: generate entry in database.
+
 	return 0, nil
 }
+
