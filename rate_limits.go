@@ -2,16 +2,22 @@ package main
 
 import (
 	"net/http"
+	"strings"
+	"sync"
 	"time"
 )
 
 var rateLimitHostTable map[string]int = map[string]int{}
 var rateLimitLastTime time.Time = time.Now()
+var rateLimitLock sync.Mutex
 
 // RateLimitRequest should be called once per uploaded image.
 // This will return true if the requester has reached its rate limit.
 func RateLimitRequest(r *http.Request) bool {
 	// TODO: in the future, there will be some sort of cookie to bypass rate limiting.
+
+	rateLimitLock.Lock()
+	defer rateLimitLock.Unlock()
 
 	now := time.Now()
 	if rateLimitLastTime.Add(time.Hour).Before(now) || rateLimitLastTime.Hour() != now.Hour() {
@@ -28,7 +34,7 @@ func RateLimitRequest(r *http.Request) bool {
 		rateLimitHostTable[host] = 1
 		return 1 <= rateLimitMaxCount()
 	} else {
-		rateLimitHostTable[host] = count+1
+		rateLimitHostTable[host] = count + 1
 		return count < rateLimitMaxCount()
 	}
 }

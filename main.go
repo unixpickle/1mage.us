@@ -42,7 +42,8 @@ func main() {
 	go func() {
 		hupChan := make(chan os.Signal, 1)
 		signal.Notify(hupChan, syscall.SIGHUP)
-		for range hupChan {
+		for {
+			<-hupChan
 			log.Print("Reloading configuration")
 			GlobalDatabase.Lock()
 			GlobalDatabase.ReloadConfig()
