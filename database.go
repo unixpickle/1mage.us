@@ -13,6 +13,9 @@ import (
 	"github.com/howeyc/gopass"
 )
 
+const DefaultMaxFileSize = 5 << 20
+const DefaultMaxCountPerHour = 30
+
 // An Image contains metadata about a single post. It does not store the image data itself.
 type Image struct {
 	MIME      string `json:"mimeType"`
@@ -41,9 +44,14 @@ type Database struct {
 	DbPath        string `json:"-"`
 	DirectoryPath string `json:"-"`
 
-	CurrentId    int     `json:"current_id"`
-	Images       []Image `json:"images"`
-	PasswordHash string  `json:"password_hash"`
+	CurrentId int     `json:"current_id"`
+	Images    []Image `json:"images"`
+
+	Config struct {
+		PasswordHash    string `json:"password_hash"`
+		MaxFileSize     int    `json:"max_file_size"`
+		MaxCountPerHour int    `json:"max_count_per_hour"`
+	} `json:"config"`
 }
 
 // LoadDatabase loads a database from a given data directory. If the database was not yet
@@ -60,10 +68,23 @@ func LoadDatabase(path string) (*Database, error) {
 		return nil, err
 	}
 
-	if database.PasswordHash == "" {
+	changed := false
+	if database.Config.PasswordHash == "" {
 		fmt.Print("Setup new password: ")
 		pass := gopass.GetPasswdMasked()
-		database.PasswordHash = HashPassword(string(pass))
+		database.Config.PasswordHash = HashPassword(string(pass))
+		changed = true
+	}
+	if database.Config.MaxFileSize == 0 {
+		database.Config.MaxFileSize = DefaultMaxFileSize
+		changed = true
+	}
+	if database.Config.MaxCountPerHour == 0 {
+		database.Config.MaxCountPerHour = DefaultMaxCountPerHour
+		changed = true
+	}
+
+	if changed {
 		if err := database.Save(); err != nil {
 			return nil, err
 		}
@@ -84,7 +105,7 @@ func (d *Database) ReloadConfig() error {
 	} else if err = json.Unmarshal(contents, &newDb); err != nil {
 		return err
 	}
-	d.PasswordHash = newDb.PasswordHash
+	d.Config = newDb.Config
 	return nil
 }
 
