@@ -13,38 +13,64 @@ import (
 	"path"
 )
 
+var ErrRateLimit error = errors.New("rate limit exceeded")
+
+type UploadResult struct {
+	Error       *string `json:"error"`
+	RateLimited bool    `json:"rate_limited"`
+	Id          *int    `json:"id"`
+}
+
+func NewUploadResultSuccess(id int) UploadResult {
+	return UploadResult{Id: &id}
+}
+
+func NewUploadResultError(err error) UploadResult {
+	str := err.Error()
+	return UploadResult{Error: &str, RateLimited: err == ErrRateLimit}
+}
+
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	reader, err := r.MultipartReader()
 	if err != nil {
-		sendUploadError(w, r, "multipart error: "+err.Error())
+		packet := map[string]string{"error": "multipart error: " + err.Error()}
+		data, _ := json.Marshal(&packet)
+		w.Write(data)
 		return
 	}
 
-	ids := []int{}
+	var results []UploadResult
 	for {
-		part, err := reader.NextPart()
-		if err != nil {
-			if err != io.EOF {
-				sendUploadError(w, r, "error reading part: "+err.Error())
-				return
+		if part, err := reader.NextPart(); err == nil {
+			if imageId, err := uploadImage(part, r); err != nil {
+				results = append(results, NewUploadResultError(err))
+			} else {
+				results = append(results, NewUploadResultSuccess(imageId))
 			}
-			break
-		}
-
-		if imageId, err := uploadImage(part, r); err != nil {
-			sendUploadError(w, r, "error uploading image: "+err.Error())
+		} else if err != io.EOF {
+			packet := map[string]string{"error": "multipart error: " + err.Error()}
+			data, _ := json.Marshal(&packet)
+			w.Write(data)
 			return
 		} else {
-			ids = append(ids, imageId)
+			break
 		}
 	}
 
-	responseMap := map[string]interface{}{"ids": ids}
-	if len(ids) == 1 {
-		responseMap["identifier"] = ids[0]
+	responseMap := map[string]interface{}{"results": results}
+
+	// For legacy purposes, set a global "error" or "identifier" field if applicable.
+	if len(results) == 1 {
+		result := results[0]
+		if result.Error != nil {
+			responseMap["error"] = *result.Error
+		} else {
+			responseMap["identifier"] = *result.Id
+		}
 	}
+
 	data, _ := json.Marshal(responseMap)
 	w.Write(data)
 }
@@ -68,7 +94,7 @@ func sendUploadError(w http.ResponseWriter, r *http.Request, errStr string) {
 
 func uploadImage(part *multipart.Part, r *http.Request) (id int, err error) {
 	if !RateLimitRequest(r) {
-		err = errors.New("rate limit exceeded")
+		err = ErrRateLimit
 		return
 	}
 
