@@ -3,6 +3,10 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
 	"io/ioutil"
 	"log"
@@ -11,6 +15,9 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"time"
+
+	"github.com/unixpickle/1mage.us/thumbnail"
 )
 
 var ErrRateLimit error = errors.New("rate limit exceeded")
@@ -98,21 +105,46 @@ func uploadImage(part *multipart.Part, r *http.Request) (id int, err error) {
 		return
 	}
 
-	tempFile, err := ioutil.TempFile("", "1mage")
+	imageFile, err := ioutil.TempFile("", "1mage")
 	if err != nil {
 		return
 	}
-	defer tempFile.Close()
-	defer os.Remove(tempFile.Name())
 
 	cappedReader := NewCappedReader(part)
-	if _, err := io.Copy(tempFile, cappedReader); err != nil {
-		return 0, err
+	if _, err = io.Copy(imageFile, cappedReader); err != nil {
+		imageFile.Close()
+		os.Remove(imageFile.Name())
+		return
 	}
 
-	// TODO: read image file to generate thumbnail.
-	// TODO: write thumbnail file.
-	// TODO: generate entry in database.
+	dbEntry := Image{
+		MIME:      mimeTypeForPart(part),
+		Timestamp: time.Now().Unix(),
+	}
 
-	return 0, nil
+	imageFile.Seek(0, 0)
+	img, _, err := image.Decode(imageFile)
+	if err != nil {
+		return finalizeUpload(dbEntry, imageFile, nil)
+	}
+
+	dbEntry.HasSize = true
+	dbEntry.HasThumbnail = true
+	dbEntry.Width = img.Bounds().Dx()
+	dbEntry.Height = img.Bounds().Dy()
+
+	var thumbData []byte
+	thumbData, dbEntry.ThumbnailWidth, dbEntry.ThumbnailHeight = thumbnail.MakeThumbnail(img)
+
+	return finalizeUpload(dbEntry, imageFile, thumbData)
+}
+
+func finalizeUpload(dbEntry Image, rawImage *os.File, thumbnail []byte) (int, error) {
+	// TODO: write the thumbnail to a temporary file.
+	// TODO: get an ID from the database.
+	// TODO: move the thumbnail and image files.
+
+	rawImage.Close()
+	os.Remove(rawImage.Name())
+	return 0, errors.New("not yet implemented")
 }

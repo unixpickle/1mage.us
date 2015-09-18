@@ -19,7 +19,7 @@ const DefaultMaxCountPerHour = 30
 // An Image contains metadata about a single post. It does not store the image data itself.
 type Image struct {
 	MIME      string `json:"mimeType"`
-	Seq       int    `json:"id"`
+	ID        int    `json:"id"`
 	Timestamp int64  `json:"timestamp"`
 
 	HasSize bool `json:"has_size"`

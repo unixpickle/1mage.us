@@ -25,6 +25,9 @@ func MakeThumbnail(orig image.Image) (data []byte, width, height int) {
 	} else {
 		newImage = resize.Resize(0, MaxThumbnailDimension, orig, resize.Lanczos3)
 	}
+	
+	width = newImage.Bounds().Dx()
+	height = newImage.Bounds().Dy()
 
 	var buff bytes.Buffer
 	if err := png.Encode(&buff, newImage); err != nil {
