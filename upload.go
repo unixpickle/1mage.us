@@ -15,6 +15,8 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/unixpickle/1mage.us/thumbnail"
@@ -139,12 +141,31 @@ func uploadImage(part *multipart.Part, r *http.Request) (id int, err error) {
 	return finalizeUpload(dbEntry, imageFile, thumbData)
 }
 
-func finalizeUpload(dbEntry Image, rawImage *os.File, thumbnail []byte) (int, error) {
-	// TODO: write the thumbnail to a temporary file.
-	// TODO: get an ID from the database.
-	// TODO: move the thumbnail and image files.
-
+func finalizeUpload(dbEntry Image, rawImage *os.File, thumbnail []byte) (id int, err error) {
 	rawImage.Close()
-	os.Remove(rawImage.Name())
-	return 0, errors.New("not yet implemented")
+
+	GlobalDatabase.Lock()
+	id = GlobalDatabase.CurrentId
+	GlobalDatabase.CurrentId++
+	GlobalDatabase.Unlock()
+
+	imagePath := filepath.Join(GlobalDatabase.DirectoryPath, strconv.Itoa(id))
+	if err = os.Rename(rawImage.Name(), imagePath); err != nil {
+		return
+	}
+
+	if thumbnail != nil {
+		thumbnailPath := filepath.Join(GlobalDatabase.DirectoryPath, strconv.Itoa(id)+"_thumb")
+		if err = ioutil.WriteFile(thumbnailPath, thumbnail, 0700); err != nil {
+			os.Remove(imagePath)
+			return
+		}
+	}
+
+	GlobalDatabase.Lock()
+	dbEntry.Id = id
+	GlobalDatabase.Images = append(GlobalDatabase.Images, dbEntry)
+	GlobalDatabase.Unlock()
+
+	return
 }
