@@ -1,8 +1,10 @@
 package imagedb
 
 import (
+	"encoding/json"
 	"errors"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -70,13 +72,13 @@ func (d *Db) Add(tempFile *os.File, mimeType string) (entry Image, version int64
 	}
 
 	oldImages := d.info.Images
-	newImages := make([]Images, len(oldImages)+1)
+	newImages := make([]Image, len(oldImages)+1)
 	copy(newImages, oldImages)
 	newImages[len(oldImages)] = entry
 	d.info.Images = newImages
 
 	if err = d.writeToFile(); err != nil {
-		d.Version--
+		d.info.Version--
 		d.info.Images = oldImages
 		os.Remove(d.pathForImage(entry.Id))
 		os.Remove(d.pathForThumbnail(entry.Id))
@@ -100,8 +102,8 @@ func (d *Db) Delete(imageId int64) (version int64, err error) {
 		return 0, NoSuchImageErr
 	}
 
-	d.Version++
-	version = d.Version
+	d.info.Version++
+	version = d.info.Version
 
 	oldImages := d.info.Images
 	newImages := make([]Image, len(oldImages)-1)
@@ -109,9 +111,9 @@ func (d *Db) Delete(imageId int64) (version int64, err error) {
 	copy(newImages[imageIndex:], oldImages[imageIndex+1:])
 	d.info.Images = newImages
 
-	if err != d.writeToFile(); err != nil {
+	if err = d.writeToFile(); err != nil {
 		// If we fail to save the database, we can undo our changes without harm.
-		d.Version--
+		d.info.Version--
 		d.info.Images = oldImages
 		d.lock.Unlock()
 		return

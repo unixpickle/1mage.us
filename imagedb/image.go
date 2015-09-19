@@ -1,6 +1,7 @@
 package imagedb
 
 import (
+	"bytes"
 	"image"
 	_ "image/gif"
 	_ "image/jpeg"
@@ -34,28 +35,31 @@ func processImage(tempFile *os.File, mimeType string) (entry Image, thumbnail *o
 	entry.MIME = mimeType
 	entry.Timestamp = time.Now().Unix()
 
-	if err = tempFile.Seek(0, 0); err != nil {
+	if _, err = tempFile.Seek(0, 0); err != nil {
 		return
 	}
 
 	parsedImage, _, err := image.Decode(tempFile)
-	if err == nil {
-		entry.HasSize = true
-		entry.Width = parsedImage.Bounds().Dx()
-		entry.Height = parsedImage.Bounds().Dy()
+	if err != nil {
+		err = nil
+		return
+	}
+	
+	entry.HasSize = true
+	entry.Width = parsedImage.Bounds().Dx()
+	entry.Height = parsedImage.Bounds().Dy()
+	entry.HasThumbnail = true
 
-		thumbnail, err = ioutil.TempFile("", "1mage_thumbnail")
-		if err != nil {
-			return
-		}
+	thumbnail, err = ioutil.TempFile("", "1mage_thumbnail")
+	if err != nil {
+		return
+	}
 
-		var thumbnailData []byte
-		thumbnailData, entry.ThumbnailWidth, entry.ThumbnailHeight = makeThumbnail(parsedImage)
-		if _, err = thumbnail.Write(thumbnailData); err != nil {
-			thumbnail.Close()
-			os.Remove(thumbnail.Name())
-			return
-		}
+	var thumbnailData []byte
+	thumbnailData, entry.ThumbnailWidth, entry.ThumbnailHeight = makeThumbnail(parsedImage)
+	if _, err = thumbnail.Write(thumbnailData); err != nil {
+		thumbnail.Close()
+		os.Remove(thumbnail.Name())
 	}
 
 	return
@@ -68,12 +72,12 @@ func makeThumbnail(orig image.Image) (data []byte, width, height int) {
 	origHeight := orig.Bounds().Dy()
 
 	var newImage image.Image
-	if origWidth <= MaxThumbnailDimension && origHeight <= MaxThumbnailDimension {
+	if origWidth <= maxThumbnailDimension && origHeight <= maxThumbnailDimension {
 		newImage = orig
 	} else if origWidth > origHeight {
-		newImage = resize.Resize(MaxThumbnailDimension, 0, orig, resize.Lanczos3)
+		newImage = resize.Resize(maxThumbnailDimension, 0, orig, resize.Lanczos3)
 	} else {
-		newImage = resize.Resize(0, MaxThumbnailDimension, orig, resize.Lanczos3)
+		newImage = resize.Resize(0, maxThumbnailDimension, orig, resize.Lanczos3)
 	}
 
 	width = newImage.Bounds().Dx()
