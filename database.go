@@ -32,12 +32,6 @@ type Image struct {
 }
 
 // The Database stores a history of images posted to this site.
-//
-// Database extends sync.RWMutex and should be locked according to the requirements of the user. If
-// you plan to modify Images or CurrentId, you should lock the database for writing. However, if you
-// are simply accessing the fields for reading, you only need to lock it for reading. Certain
-// methods will require you to lock the Database for reading or writing. Consult the documentation
-// of these methods for more information.
 type Database struct {
 	sync.RWMutex `json:"-"`
 
