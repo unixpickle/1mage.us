@@ -104,6 +104,8 @@ func (d *Db) Add(tempFile *os.File, mimeType string) (entry Image, version int64
 	version = d.info.Version
 
 	if err = os.Rename(tempFile.Name(), d.pathForImage(entry.Id)); err != nil {
+		d.info.Version--
+		d.info.CurrentId--
 		os.Remove(tempFile.Name())
 		if thumbnailFile != nil {
 			os.Remove(thumbnailFile.Name())
@@ -113,6 +115,8 @@ func (d *Db) Add(tempFile *os.File, mimeType string) (entry Image, version int64
 
 	if thumbnailFile != nil {
 		if err = os.Rename(thumbnailFile.Name(), d.pathForThumbnail(entry.Id)); err != nil {
+			d.info.Version--
+			d.info.CurrentId--
 			os.Remove(d.pathForImage(entry.Id))
 			os.Remove(thumbnailFile.Name())
 			return
@@ -127,6 +131,7 @@ func (d *Db) Add(tempFile *os.File, mimeType string) (entry Image, version int64
 
 	if err = d.writeToFile(); err != nil {
 		d.info.Version--
+		d.info.CurrentId--
 		d.info.Images = oldImages
 		os.Remove(d.pathForImage(entry.Id))
 		os.Remove(d.pathForThumbnail(entry.Id))
@@ -140,8 +145,10 @@ func (d *Db) Delete(imageId int64) (version int64, err error) {
 	d.lock.Lock()
 
 	imageIndex := -1
+	var deletingImage Image
 	for i, image := range d.info.Images {
 		if image.Id == imageId {
+			deletingImage = image
 			imageIndex = i
 		}
 	}
@@ -170,7 +177,9 @@ func (d *Db) Delete(imageId int64) (version int64, err error) {
 	d.lock.Unlock()
 
 	os.Remove(d.pathForImage(imageId))
-	os.Remove(d.pathForThumbnail(imageId))
+	if deletingImage.HasThumbnail {
+		os.Remove(d.pathForThumbnail(imageId))
+	}
 
 	return
 }

@@ -95,6 +95,7 @@ func TestAdd(t *testing.T) {
 	if err != nil {
 		t.Fatal("failed to create temp file:", err)
 	}
+	versionBefore := db.Version()
 	if _, _, err := db.Add(tempFile, "image/png"); err == nil {
 		t.Error("adding another image should have failed")
 	}
@@ -104,5 +105,42 @@ func TestAdd(t *testing.T) {
 	if _, err := os.Stat(tempFile.Name()); err == nil || !os.IsNotExist(err) {
 		t.Error("the temporary file still exists")
 	}
+	if db.Version() != versionBefore {
+		t.Error("version number changed")
+	}
 }
 
+func TestDelete(t *testing.T) {
+	tempDir, err := ioutil.TempDir("", "test_db_add")
+	if err != nil {
+		t.Fatal("failed to create workspace directory")
+	}
+	defer os.RemoveAll(tempDir)
+	db, err := NewDb(filepath.Join(tempDir, "db"))
+	if err != nil {
+		t.Fatal("failed to create db:", err)
+	}
+
+	for i := 0; i < 5; i++ {
+		imageFile, err := ioutil.TempFile(tempDir, "test_db_add")
+		if err != nil {
+			t.Fatal("failed to create temp file:", err)
+		}
+		if _, _, err := db.Add(imageFile, "text/plain"); err != nil {
+			t.Error("failed to add image to DB:", err)
+		}
+	}
+
+	if version, err := db.Delete(2); err != nil {
+		t.Fatal("failed to delete image:", err)
+	} else if version != int64(6) {
+		t.Error("invalid version:", version)
+	}
+	expectIds := []int64{0, 1, 3, 4}
+	images, _ := db.Images()
+	for i, image := range images {
+		if image.Id != expectIds[i] {
+			t.Error("unexpected ID:", i, image.Id)
+		}
+	}
+}
