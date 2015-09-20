@@ -6,10 +6,13 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 )
 
-var GlobalDatabase *Database
+// GlobalChangeLock should be locked for reading whenever a change is being made to the database.
+// When the app is shutting down, this will be locked for writing so that no more changes may occur.
+var GlobalChangeLock sync.RWMutex
 
 func main() {
 	if len(os.Args) != 3 {
@@ -18,9 +21,9 @@ func main() {
 	}
 
 	var err error
-	GlobalDatabase, err = LoadDatabase(os.Args[2])
+	GlobalDb, err = SetupDb(os.Args[2])
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Failed to load database:", err)
+		fmt.Fprintln(os.Stderr, "Failed to setup database:", err)
 		os.Exit(1)
 	}
 
@@ -39,23 +42,11 @@ func main() {
 		}
 	}()
 
-	go func() {
-		hupChan := make(chan os.Signal, 1)
-		signal.Notify(hupChan, syscall.SIGHUP)
-		for {
-			<-hupChan
-			log.Print("Reloading configuration")
-			GlobalDatabase.Lock()
-			GlobalDatabase.ReloadConfig()
-			GlobalDatabase.Unlock()
-		}
-	}()
-
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChan
 
 	log.Print("1mage.us shutting down...")
-	GlobalDatabase.Lock()
+	GlobalChangeLock.Lock()
 	os.Exit(0)
 }

@@ -10,15 +10,12 @@ var ErrCapExceeded = errors.New("size cap reached")
 // CappedReader is an io.Reader which fails with an error when too much data is read.
 type CappedReader struct {
 	reader    io.Reader
-	remaining int
+	remaining int64
 }
 
 // NewCappedReader creates a CappedReader which uses the global database's size cap.
 func NewCappedReader(input io.Reader) *CappedReader {
-	GlobalDatabase.RLock()
-	maxSize := GlobalDatabase.Config.MaxFileSize
-	GlobalDatabase.RUnlock()
-	return &CappedReader{input, maxSize}
+	return &CappedReader{input, GlobalDb.Config().MaxFileSize}
 }
 
 func (c *CappedReader) Read(p []byte) (int, error) {
@@ -26,10 +23,10 @@ func (c *CappedReader) Read(p []byte) (int, error) {
 	if err != nil && err != io.EOF {
 		return 0, err
 	} else {
-		if count > c.remaining {
+		if int64(count) > c.remaining {
 			return 0, ErrCapExceeded
 		}
-		c.remaining -= count
+		c.remaining -= int64(count)
 		return count, err
 	}
 }

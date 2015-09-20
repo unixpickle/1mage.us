@@ -11,110 +11,104 @@ import (
 	"sync"
 
 	"github.com/howeyc/gopass"
+	"github.com/unixpickle/1mage.us/imagedb"
 )
 
 const DefaultMaxFileSize = 5 << 20
 const DefaultMaxCountPerHour = 30
 
-// An Image contains metadata about a single post. It does not store the image data itself.
-type Image struct {
-	MIME      string `json:"mimeType"`
-	Id        int    `json:"id"`
-	Timestamp int64  `json:"timestamp"`
+var GlobalDb *Db
 
-	HasSize bool `json:"has_size"`
-	Width   int  `json:"width"`
-	Height  int  `json:"height"`
-
-	HasThumbnail    bool `json:"has_thumbnail"`
-	ThumbnailWidth  int  `json:"thumb_width"`
-	ThumbnailHeight int  `json:"thumb_height"`
+type Config struct {
+	PasswordHash    string
+	MaxFileSize     int64
+	MaxCountPerHour int64
 }
 
-// The Database stores a history of images posted to this site.
-type Database struct {
-	sync.RWMutex `json:"-"`
+type Db struct {
+	*imagedb.Db
 
-	DbPath        string `json:"-"`
-	DirectoryPath string `json:"-"`
-
-	CurrentId int     `json:"current_id"`
-	Images    []Image `json:"images"`
-
-	Config struct {
-		PasswordHash    string `json:"password_hash"`
-		MaxFileSize     int    `json:"max_file_size"`
-		MaxCountPerHour int    `json:"max_count_per_hour"`
-	} `json:"config"`
+	configLock sync.RWMutex
+	configPath string
+	config     Config
 }
 
-// LoadDatabase loads a database from a given data directory. If the database was not yet
-// configured, this will prompt the user to setup a new database.
-func LoadDatabase(path string) (*Database, error) {
-	dbPath := filepath.Join(path, "db.json")
-	database := Database{DirectoryPath: path, DbPath: dbPath, Images: []Image{}}
-
-	if contents, err := ioutil.ReadFile(dbPath); err == nil {
-		if err := json.Unmarshal(contents, &database); err != nil {
-			return nil, err
-		}
-	} else if err = database.Save(); err != nil {
+// SetupDb creates a new database or opens an existing one at a given directory.
+// This will prompt the user to set a password if the database is being created.
+func SetupDb(path string) (*Db, error) {
+	imageDb, err := imagedb.NewDb(path)
+	if err != nil {
 		return nil, err
 	}
 
-	changed := false
-	if database.Config.PasswordHash == "" {
+	res := Db{imageDb, sync.RWMutex{}, filepath.Join(path, "config.json"), Config{}}
+	saveConfig := false
+
+	if res.loadConfig() != nil {
+		saveConfig = true
+	}
+	if res.config.PasswordHash == "" {
 		fmt.Print("Setup new password: ")
 		pass := gopass.GetPasswdMasked()
-		database.Config.PasswordHash = HashPassword(string(pass))
-		changed = true
+		res.config.PasswordHash = hashPassword(string(pass))
+		saveConfig = true
 	}
-	if database.Config.MaxFileSize == 0 {
-		database.Config.MaxFileSize = DefaultMaxFileSize
-		changed = true
+	if res.config.MaxFileSize == 0 {
+		res.config.MaxFileSize = DefaultMaxFileSize
+		saveConfig = true
 	}
-	if database.Config.MaxCountPerHour == 0 {
-		database.Config.MaxCountPerHour = DefaultMaxCountPerHour
-		changed = true
+	if res.config.MaxCountPerHour == 0 {
+		res.config.MaxCountPerHour = DefaultMaxCountPerHour
+		saveConfig = true
 	}
 
-	if changed {
-		if err := database.Save(); err != nil {
+	if saveConfig {
+		if err := res.saveConfig(); err != nil {
 			return nil, err
 		}
 	}
 
-	return &database, nil
+	return &res, nil
 }
 
-// Reload updates the configuration parameters by reading them from the DB file.
-// This allows the administrator to update the server's configuration while it is running.
-// This will not re-load the images and current ID from the database, since administrators
-// should have no reason to modify them by hand.
-// The database must be locked for writing.
-func (d *Database) ReloadConfig() error {
-	var newDb Database
-	if contents, err := ioutil.ReadFile(d.DbPath); err != nil {
-		return err
-	} else if err = json.Unmarshal(contents, &newDb); err != nil {
-		return err
+func (d *Db) Config() Config {
+	d.configLock.RLock()
+	defer d.configLock.RUnlock()
+	return d.config
+}
+
+func (d *Db) SetConfig(c Config) (err error) {
+	d.configLock.Lock()
+	defer d.configLock.Unlock()
+
+	oldConfig := d.config
+	d.config = c
+
+	if err = d.saveConfig(); err != nil {
+		d.config = oldConfig
 	}
-	d.Config = newDb.Config
-	return nil
+
+	return
 }
 
-// Save writes the database to the file from which it was loaded.
-// This requires that the database was locked for writing.
-func (d *Database) Save() error {
-	if data, err := json.Marshal(d); err != nil {
+func (d *Db) loadConfig() error {
+	if data, err := ioutil.ReadFile(d.configPath); err != nil {
 		return err
 	} else {
-		return ioutil.WriteFile(d.DbPath, data, 0700)
+		return json.Unmarshal(data, &d.config)
 	}
 }
 
-// HashPassword returns the SHA-256 hash of a string.
-func HashPassword(password string) string {
+func (d *Db) saveConfig() error {
+	if data, err := json.Marshal(d.config); err != nil {
+		return err
+	} else {
+		return ioutil.WriteFile(d.configPath, data, 0700)
+	}
+}
+
+// hashPassword returns the SHA-256 hash of a string.
+func hashPassword(password string) string {
 	hash := sha256.Sum256([]byte(password))
 	return strings.ToLower(hex.EncodeToString(hash[:]))
 }

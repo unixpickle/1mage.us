@@ -19,7 +19,5 @@ func RateLimitRequest(r *http.Request) bool {
 }
 
 func rateLimitMaxCount() int64 {
-	GlobalDatabase.RLock()
-	defer GlobalDatabase.RUnlock()
-	return int64(GlobalDatabase.Config.MaxCountPerHour)
+	return GlobalDb.Config().MaxCountPerHour
 }
