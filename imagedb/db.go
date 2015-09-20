@@ -12,6 +12,8 @@ import (
 )
 
 var NoSuchImageErr = errors.New("the specified image does not exist")
+var NotADirectoryErr = errors.New("not a directory")
+var infoFileName = "info.json"
 
 // The Db stores a history of images and manages their associated files.
 type Db struct {
@@ -27,12 +29,58 @@ type Db struct {
 	}
 }
 
+// NewDb creates a new database or opens an existing one at a given directory.
+//
+// Only one process should open a database at any given time.
+// The database is safe for concurrency in one Go process, but not across processes.
+func NewDb(dirPath string) (*Db, error) {
+	if info, err := os.Stat(dirPath); err != nil {
+		if !os.IsNotExist(err) {
+			return nil, err
+		}
+		return createDb(dirPath)
+	} else if !info.IsDir() {
+		return nil, NotADirectoryErr
+	} else {
+		return loadDb(dirPath)
+	}
+}
+
+func createDb(dirPath string) (*Db, error) {
+	var db Db
+	db.dirPath = dirPath
+	db.infoPath = filepath.Join(db.dirPath, infoFileName)
+
+	if err := os.Mkdir(db.dirPath, 0700); err != nil {
+		return nil, err
+	} else if err := db.writeToFile(); err != nil {
+		return nil, err
+	} else {
+		return &db, nil
+	}
+}
+
+func loadDb(dirPath string) (*Db, error) {
+	var db Db
+	db.dirPath = dirPath
+	db.infoPath = filepath.Join(db.dirPath, infoFileName)
+
+	if data, err := ioutil.ReadFile(db.infoPath); err != nil {
+		return nil, err
+	} else if err := json.Unmarshal(data, &db.info); err != nil {
+		return nil, err
+	} else {
+		return &db, nil
+	}
+}
+
 // Add adds an image to the database.
 //
 // You must supply a temporary file with the image data and the MIME type of the file.
 // This will automatically generate a thumbnail for the image and detect its dimensions.
 //
-// Whether or not this succeeds, the temporary file you pass will be closed and deleted.
+// Whether or not this succeeds, the temporary file you provide will automatically be closed and
+// deleted.
 func (d *Db) Add(tempFile *os.File, mimeType string) (entry Image, version int64, err error) {
 	entry, thumbnailFile, err := processImage(tempFile, mimeType)
 	if err != nil {

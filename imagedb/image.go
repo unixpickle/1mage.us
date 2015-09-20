@@ -44,7 +44,7 @@ func processImage(tempFile *os.File, mimeType string) (entry Image, thumbnail *o
 		err = nil
 		return
 	}
-	
+
 	entry.HasSize = true
 	entry.Width = parsedImage.Bounds().Dx()
 	entry.Height = parsedImage.Bounds().Dy()
