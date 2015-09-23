@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -10,9 +11,13 @@ import (
 	"syscall"
 )
 
-// GlobalChangeLock should be locked for reading whenever a change is being made to the database.
-// When the app is shutting down, this will be locked for writing so that no more changes may occur.
-var GlobalChangeLock sync.RWMutex
+// ShutdownLock should be locked for reading whenever the database is being modified.
+// When the app is shutting down, this will be locked for writing to block further changes.
+var ShutdownLock sync.RWMutex
+
+// TemporaryDirectory can be used in tasks like uploading files. It ensures that the file will be
+// deleted if the task terminates.
+var TemporaryDirectory string
 
 func main() {
 	if len(os.Args) != 3 {
@@ -21,6 +26,13 @@ func main() {
 	}
 
 	var err error
+	TemporaryDirectory, err = ioutil.TempDir("", "1mage_temp")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Failed to setup temporary directory")
+		os.Exit(1)
+	}
+	defer os.RemoveAll(TemporaryDirectory)
+
 	GlobalDb, err = SetupDb(os.Args[2])
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Failed to setup database:", err)
@@ -47,6 +59,6 @@ func main() {
 	<-sigChan
 
 	log.Print("1mage.us shutting down...")
-	GlobalChangeLock.Lock()
-	os.Exit(0)
+	ShutdownLock.Lock()
+	return
 }
