@@ -15,7 +15,7 @@ var httpNamer ratelimit.HTTPRemoteNamer
 func RateLimitRequest(r *http.Request) bool {
 	// TODO: in the future, there will be some sort of cookie to bypass rate limiting.
 	id := httpNamer.Name(r)
-	return -rateLimiter.Decrement(id) <= rateLimitMaxCount()
+	return -rateLimiter.Decrement(id) > rateLimitMaxCount()
 }
 
 func rateLimitMaxCount() int64 {

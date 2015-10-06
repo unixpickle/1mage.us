@@ -40,10 +40,14 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			ServeAssetForRequest(w, r)
-		} else {
+		log.Print("request for: ", r.URL.Path)
+		switch r.URL.Path {
+		case "/":
 			ServePage(w, "upload.html")
+		case "/upload":
+			ServeUpload(w, r)
+		default:
+			ServeAssetForRequest(w, r)
 		}
 	})
 

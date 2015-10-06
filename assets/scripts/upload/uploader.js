@@ -7,13 +7,32 @@
 
   Uploader.prototype._handleFiles = function(files) {
     this._chooser.setEnabled(false);
-    window.circle.switchScene(window.Circle.PROMPT_SCENE);
+    window.circle.switchScene(window.Circle.UPLOAD_SCENE);
+    window.circle.setProgress(0);
+
+    var upload = new Upload(files);
+    upload.onDone = function() {
+      // TODO: this.
+      window.alert('TODO: this. (onDone)');
+    }.bind(this);
+    upload.onError = function(msg) {
+      window.alert('error: ' + msg);
+      this._chooser.setEnabled(true);
+      window.circle.switchScene(window.Circle.PROMPT_SCENE);
+    }.bind(this);
+    upload.onProgress = function(p) {
+      window.circle.setProgress(p);
+    }.bind(this);
+
+    // TODO: here, handle an authentication prompt.
+
+    upload.start();
   };
 
   function Upload(files) {
-    var formData = new FormData();
+    this._formData = new FormData();
     for (var i = 0, len = files.length; i < len; ++i) {
-      formData.append(files[i].name, files[i]);
+      this._formData.append(files[i].name, files[i]);
     }
     this._xhr = new XMLHttpRequest();
 
@@ -22,8 +41,14 @@
     this.onProgress = null;
   }
 
+  Upload.prototype.start = function() {
+    this._registerEvents();
+    this._xhr.open('POST', '/upload', true);
+    this._xhr.send(this._formData);
+  };
+
   Upload.prototype._handleError = function(errorStr) {
-    this.onError();
+    this.onError(errorStr);
   };
 
   Upload.prototype._handleLoad = function() {
@@ -34,11 +59,7 @@
       this._handleError('invalid response');
       return;
     }
-    if (value.error) {
-      this._handleError(value.error);
-    } else {
-      this.onDone();
-    }
+    this._handleError('TODO: process the response to the upload call. ' + this._xhr.response);
   };
 
   Upload.prototype._handleProgress = function(e) {

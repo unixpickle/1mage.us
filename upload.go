@@ -16,6 +16,7 @@ import (
 
 var RateLimitErr = errors.New("rate limit exceeded")
 
+// An UploadResult is sent to clients whenever they use the upload API.
 type UploadResult struct {
 	GlobalError *string `json:"error"`
 
