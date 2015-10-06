@@ -97,7 +97,11 @@ func uploadImage(p *multipart.Part, req *http.Request) (*imagedb.Image, error) {
 }
 
 func mimeTypeForPart(part *multipart.Part) string {
-	// TODO: check the multipart header to see if the browser provides a MIME type
+	if contentType := part.Header.Get("Content-Type"); contentType != "" {
+		if _, _, err := mime.ParseMediaType(contentType); err == nil {
+			return contentType
+		}
+	}
 	ext := path.Ext(part.FileName())
 	mimeType := mime.TypeByExtension(ext)
 	if mimeType == "" {
