@@ -4,10 +4,11 @@
 
 # TODO
 
- * Include max file size in configuration
- * Implement capped reader interface which fails when too much is uploaded.
- * Figure out a reasonable rate-limiting system
- * Finish the upload API
+ * Add animation for auth dialog
+ * Create authentication API on backend
+ * Implement authentication API in auth dialog
+ * Use auth dialog for rate limited uploads
+ * Implement gallery functionality
 
 ### License
 
