@@ -1,0 +1,89 @@
+.auth-dialog {
+  position: fixed;
+  top: calc(50% - 188px);
+  left: calc(50% - 162px);
+  width: 376px;
+  height: 324px;
+  background-color: white;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.auth-dialog-shielding {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  display: block;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.auth-dialog-title {
+  font-family: Roboto, sans-serif;
+  font-weight: 400;
+  font-size: 30px;
+  text-align: center;
+
+  margin: 20px 0 0 0;
+  padding: 0;
+}
+
+.auth-dialog-lock {
+  display: block;
+  height: 100px;
+  background-image: url('../images/lock.svg');
+  background-size: 100% 100%;
+  margin-top: 15px;
+}
+
+.auth-dialog-input {
+  display: block;
+  position: relative;
+  left: calc(50% - 130px);
+  padding: 5px 5px;
+  margin: 25px 0 0 0;
+  width: 260px;
+  height: 30px;
+  font-size: 25px;
+  border: 3px solid #65bcd4;
+}
+
+.auth-dialog-input:focus {
+  outline: 0;
+}
+
+.auth-dialog-button {
+  font-family: Roboto, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+
+  padding: 5px 5px 5px 5px;
+  border: none;
+  background-color: white;
+
+  cursor: pointer;
+
+  float: right;
+  color: #65bcd4;
+}
+
+.auth-dialog-button-cancel {
+  float: left;
+  color: black;
+}
+
+.auth-dialog-button:active {
+  background-color: #f0f0f0;
+}
+
+.auth-dialog-buttons {
+  position: relative;
+  left: calc(50% - 100px);
+  margin-top: 20px;
+  width: 200px;
+}
