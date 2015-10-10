@@ -5,12 +5,12 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"strings"
-	"os"
-	"time"
 	"io/ioutil"
+	"os"
 	"path"
 	"path/filepath"
+	"strings"
+	"time"
 )
 
 func bindata_read(data []byte, name string) ([]byte, error) {
@@ -36,9 +36,9 @@ type asset struct {
 }
 
 type bindata_file_info struct {
-	name string
-	size int64
-	mode os.FileMode
+	name    string
+	size    int64
+	mode    os.FileMode
 	modTime time.Time
 }
 
@@ -77,7 +77,7 @@ func assets_ds_store() (*asset, error) {
 	}
 
 	info := bindata_file_info{name: "assets/.DS_Store", size: 6148, mode: os.FileMode(420), modTime: time.Unix(1441221573, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -97,7 +97,7 @@ func assets_images_lock_svg() (*asset, error) {
 	}
 
 	info := bindata_file_info{name: "assets/images/lock.svg", size: 1305, mode: os.FileMode(420), modTime: time.Unix(1444442559, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -117,7 +117,7 @@ func assets_scripts_ds_store() (*asset, error) {
 	}
 
 	info := bindata_file_info{name: "assets/scripts/.DS_Store", size: 6148, mode: os.FileMode(420), modTime: time.Unix(1440977663, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -137,7 +137,7 @@ func assets_scripts_auth_dialog_js() (*asset, error) {
 	}
 
 	info := bindata_file_info{name: "assets/scripts/auth_dialog.js", size: 1431, mode: os.FileMode(420), modTime: time.Unix(1444442559, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -157,7 +157,7 @@ func assets_scripts_pentagons_js() (*asset, error) {
 	}
 
 	info := bindata_file_info{name: "assets/scripts/pentagons.js", size: 12891, mode: os.FileMode(420), modTime: time.Unix(1440952118, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -177,7 +177,7 @@ func assets_scripts_upload_circle_js() (*asset, error) {
 	}
 
 	info := bindata_file_info{name: "assets/scripts/upload/circle.js", size: 2799, mode: os.FileMode(420), modTime: time.Unix(1441223094, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -197,7 +197,7 @@ func assets_scripts_upload_file_chooser_js() (*asset, error) {
 	}
 
 	info := bindata_file_info{name: "assets/scripts/upload/file_chooser.js", size: 3146, mode: os.FileMode(420), modTime: time.Unix(1441392857, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -217,7 +217,7 @@ func assets_scripts_upload_sizing_js() (*asset, error) {
 	}
 
 	info := bindata_file_info{name: "assets/scripts/upload/sizing.js", size: 719, mode: os.FileMode(420), modTime: time.Unix(1440955943, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -237,7 +237,7 @@ func assets_scripts_upload_uploader_js() (*asset, error) {
 	}
 
 	info := bindata_file_info{name: "assets/scripts/upload/uploader.js", size: 2731, mode: os.FileMode(420), modTime: time.Unix(1444265053, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -257,7 +257,7 @@ func assets_style_auth_dialog_css() (*asset, error) {
 	}
 
 	info := bindata_file_info{name: "assets/style/auth_dialog.css", size: 1515, mode: os.FileMode(420), modTime: time.Unix(1444442559, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -277,7 +277,7 @@ func assets_style_upload_css() (*asset, error) {
 	}
 
 	info := bindata_file_info{name: "assets/style/upload.css", size: 827, mode: os.FileMode(420), modTime: time.Unix(1441421802, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -297,7 +297,7 @@ func assets_upload_html() (*asset, error) {
 	}
 
 	info := bindata_file_info{name: "assets/upload.html", size: 4516, mode: os.FileMode(420), modTime: time.Unix(1444442559, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -320,7 +320,7 @@ func Asset(name string) ([]byte, error) {
 // It simplifies safe initialization of global variables.
 func MustAsset(name string) []byte {
 	a, err := Asset(name)
-	if (err != nil) {
+	if err != nil {
 		panic("asset: Asset(" + name + "): " + err.Error())
 	}
 
@@ -353,18 +353,18 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"assets/.DS_Store": assets_ds_store,
-	"assets/images/lock.svg": assets_images_lock_svg,
-	"assets/scripts/.DS_Store": assets_scripts_ds_store,
-	"assets/scripts/auth_dialog.js": assets_scripts_auth_dialog_js,
-	"assets/scripts/pentagons.js": assets_scripts_pentagons_js,
-	"assets/scripts/upload/circle.js": assets_scripts_upload_circle_js,
+	"assets/.DS_Store":                      assets_ds_store,
+	"assets/images/lock.svg":                assets_images_lock_svg,
+	"assets/scripts/.DS_Store":              assets_scripts_ds_store,
+	"assets/scripts/auth_dialog.js":         assets_scripts_auth_dialog_js,
+	"assets/scripts/pentagons.js":           assets_scripts_pentagons_js,
+	"assets/scripts/upload/circle.js":       assets_scripts_upload_circle_js,
 	"assets/scripts/upload/file_chooser.js": assets_scripts_upload_file_chooser_js,
-	"assets/scripts/upload/sizing.js": assets_scripts_upload_sizing_js,
-	"assets/scripts/upload/uploader.js": assets_scripts_upload_uploader_js,
-	"assets/style/auth_dialog.css": assets_style_auth_dialog_css,
-	"assets/style/upload.css": assets_style_upload_css,
-	"assets/upload.html": assets_upload_html,
+	"assets/scripts/upload/sizing.js":       assets_scripts_upload_sizing_js,
+	"assets/scripts/upload/uploader.js":     assets_scripts_upload_uploader_js,
+	"assets/style/auth_dialog.css":          assets_style_auth_dialog_css,
+	"assets/style/upload.css":               assets_style_upload_css,
+	"assets/upload.html":                    assets_upload_html,
 }
 
 // AssetDir returns the file names below a certain
@@ -403,89 +403,77 @@ func AssetDir(name string) ([]string, error) {
 }
 
 type _bintree_t struct {
-	Func func() (*asset, error)
+	Func     func() (*asset, error)
 	Children map[string]*_bintree_t
 }
+
 var _bintree = &_bintree_t{nil, map[string]*_bintree_t{
 	"assets": &_bintree_t{nil, map[string]*_bintree_t{
-		".DS_Store": &_bintree_t{assets_ds_store, map[string]*_bintree_t{
-		}},
+		".DS_Store": &_bintree_t{assets_ds_store, map[string]*_bintree_t{}},
 		"images": &_bintree_t{nil, map[string]*_bintree_t{
-			"lock.svg": &_bintree_t{assets_images_lock_svg, map[string]*_bintree_t{
-			}},
+			"lock.svg": &_bintree_t{assets_images_lock_svg, map[string]*_bintree_t{}},
 		}},
 		"scripts": &_bintree_t{nil, map[string]*_bintree_t{
-			".DS_Store": &_bintree_t{assets_scripts_ds_store, map[string]*_bintree_t{
-			}},
-			"auth_dialog.js": &_bintree_t{assets_scripts_auth_dialog_js, map[string]*_bintree_t{
-			}},
-			"pentagons.js": &_bintree_t{assets_scripts_pentagons_js, map[string]*_bintree_t{
-			}},
+			".DS_Store":      &_bintree_t{assets_scripts_ds_store, map[string]*_bintree_t{}},
+			"auth_dialog.js": &_bintree_t{assets_scripts_auth_dialog_js, map[string]*_bintree_t{}},
+			"pentagons.js":   &_bintree_t{assets_scripts_pentagons_js, map[string]*_bintree_t{}},
 			"upload": &_bintree_t{nil, map[string]*_bintree_t{
-				"circle.js": &_bintree_t{assets_scripts_upload_circle_js, map[string]*_bintree_t{
-				}},
-				"file_chooser.js": &_bintree_t{assets_scripts_upload_file_chooser_js, map[string]*_bintree_t{
-				}},
-				"sizing.js": &_bintree_t{assets_scripts_upload_sizing_js, map[string]*_bintree_t{
-				}},
-				"uploader.js": &_bintree_t{assets_scripts_upload_uploader_js, map[string]*_bintree_t{
-				}},
+				"circle.js":       &_bintree_t{assets_scripts_upload_circle_js, map[string]*_bintree_t{}},
+				"file_chooser.js": &_bintree_t{assets_scripts_upload_file_chooser_js, map[string]*_bintree_t{}},
+				"sizing.js":       &_bintree_t{assets_scripts_upload_sizing_js, map[string]*_bintree_t{}},
+				"uploader.js":     &_bintree_t{assets_scripts_upload_uploader_js, map[string]*_bintree_t{}},
 			}},
 		}},
 		"style": &_bintree_t{nil, map[string]*_bintree_t{
-			"auth_dialog.css": &_bintree_t{assets_style_auth_dialog_css, map[string]*_bintree_t{
-			}},
-			"upload.css": &_bintree_t{assets_style_upload_css, map[string]*_bintree_t{
-			}},
+			"auth_dialog.css": &_bintree_t{assets_style_auth_dialog_css, map[string]*_bintree_t{}},
+			"upload.css":      &_bintree_t{assets_style_upload_css, map[string]*_bintree_t{}},
 		}},
-		"upload.html": &_bintree_t{assets_upload_html, map[string]*_bintree_t{
-		}},
+		"upload.html": &_bintree_t{assets_upload_html, map[string]*_bintree_t{}},
 	}},
 }}
 
 // Restore an asset under the given directory
 func RestoreAsset(dir, name string) error {
-        data, err := Asset(name)
-        if err != nil {
-                return err
-        }
-        info, err := AssetInfo(name)
-        if err != nil {
-                return err
-        }
-        err = os.MkdirAll(_filePath(dir, path.Dir(name)), os.FileMode(0755))
-        if err != nil {
-                return err
-        }
-        err = ioutil.WriteFile(_filePath(dir, name), data, info.Mode())
-        if err != nil {
-                return err
-        }
-        err = os.Chtimes(_filePath(dir, name), info.ModTime(), info.ModTime())
-        if err != nil {
-                return err
-        }
-        return nil
+	data, err := Asset(name)
+	if err != nil {
+		return err
+	}
+	info, err := AssetInfo(name)
+	if err != nil {
+		return err
+	}
+	err = os.MkdirAll(_filePath(dir, path.Dir(name)), os.FileMode(0755))
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(_filePath(dir, name), data, info.Mode())
+	if err != nil {
+		return err
+	}
+	err = os.Chtimes(_filePath(dir, name), info.ModTime(), info.ModTime())
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Restore assets under the given directory recursively
 func RestoreAssets(dir, name string) error {
-        children, err := AssetDir(name)
-        if err != nil { // File
-                return RestoreAsset(dir, name)
-        } else { // Dir
-                for _, child := range children {
-                        err = RestoreAssets(dir, path.Join(name, child))
-                        if err != nil {
-                                return err
-                        }
-                }
-        }
-        return nil
+	children, err := AssetDir(name)
+	if err != nil { // File
+		return RestoreAsset(dir, name)
+	} else { // Dir
+		for _, child := range children {
+			err = RestoreAssets(dir, path.Join(name, child))
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func _filePath(dir, name string) string {
-        cannonicalName := strings.Replace(name, "\\", "/", -1)
-        return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
+	cannonicalName := strings.Replace(name, "\\", "/", -1)
+	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
-

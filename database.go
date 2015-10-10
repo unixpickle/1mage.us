@@ -1,13 +1,10 @@
 package main
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
-	"strings"
 	"sync"
 
 	"github.com/howeyc/gopass"
@@ -50,7 +47,7 @@ func SetupDb(path string) (*Db, error) {
 	if res.config.PasswordHash == "" {
 		fmt.Print("Setup new password: ")
 		pass := gopass.GetPasswdMasked()
-		res.config.PasswordHash = hashPassword(string(pass))
+		res.config.PasswordHash = HashPassword(string(pass))
 		saveConfig = true
 	}
 	if res.config.MaxFileSize == 0 {
@@ -105,10 +102,4 @@ func (d *Db) saveConfig() error {
 	} else {
 		return ioutil.WriteFile(d.configPath, data, 0700)
 	}
-}
-
-// hashPassword returns the SHA-256 hash of a string.
-func hashPassword(password string) string {
-	hash := sha256.Sum256([]byte(password))
-	return strings.ToLower(hex.EncodeToString(hash[:]))
 }

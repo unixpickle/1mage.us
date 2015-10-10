@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"net/http"
 	"net/url"
 	"strings"
@@ -21,7 +23,7 @@ func ServeAuth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	password := r.PostFormValue("password")
-	hash := hashPassword(password)
+	hash := HashPassword(password)
 	if hash == GlobalDb.Config().PasswordHash {
 		s, _ := CookieStore.Get(r, "sessid")
 		s.Values["authenticated"] = true
@@ -30,6 +32,19 @@ func ServeAuth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write([]byte(`{"error": "invalid login credentials"}`))
+}
+
+// IsAuthenticated returns whether or not a request was authenticated.
+func IsAuthenticated(r *http.Request) bool {
+	s, _ := CookieStore.Get(r, "sessid")
+	val, ok := s.Values["authenticated"].(bool)
+	return ok && val
+}
+
+// HashPassword returns the hash of a password string.
+func HashPassword(password string) string {
+	hash := sha256.Sum256([]byte(password))
+	return strings.ToLower(hex.EncodeToString(hash[:]))
 }
 
 // validateReferer makes sure the Referer's host is the same as the current host.

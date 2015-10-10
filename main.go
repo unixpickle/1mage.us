@@ -46,6 +46,8 @@ func main() {
 			ServePage(w, "upload.html")
 		case "/upload":
 			ServeUpload(w, r)
+		case "/auth":
+			ServeAuth(w, r)
 		default:
 			ServeAssetForRequest(w, r)
 		}
