@@ -11,17 +11,20 @@ import (
 	"github.com/unixpickle/1mage.us/imagedb"
 )
 
-const DefaultMaxFileSize = 5 << 20
-const DefaultMaxCountPerHour = 30
+// These are the default configuration parameters.
+const (
+	DefaultMaxFileSize     = 5 << 20
+	DefaultMaxCountPerHour = 30
+)
 
-var GlobalDb *Db
-
+// Config is a set of user-defined parameters for an instance of the application.
 type Config struct {
-	PasswordHash    string
-	MaxFileSize     int64
-	MaxCountPerHour int64
+	PasswordHash      string
+	MaxFileSize       int64
+	MaxUploadsPerHour int64
 }
 
+// Db encapsulates imagedb.Db for image storage and adds functionality for configuration storage.
 type Db struct {
 	*imagedb.Db
 
@@ -54,8 +57,8 @@ func SetupDb(path string) (*Db, error) {
 		res.config.MaxFileSize = DefaultMaxFileSize
 		saveConfig = true
 	}
-	if res.config.MaxCountPerHour == 0 {
-		res.config.MaxCountPerHour = DefaultMaxCountPerHour
+	if res.config.MaxUploadsPerHour == 0 {
+		res.config.MaxUploadsPerHour = DefaultMaxCountPerHour
 		saveConfig = true
 	}
 
@@ -68,12 +71,14 @@ func SetupDb(path string) (*Db, error) {
 	return &res, nil
 }
 
+// Config safely returns the current configuration.
 func (d *Db) Config() Config {
 	d.configLock.RLock()
 	defer d.configLock.RUnlock()
 	return d.config
 }
 
+// SetConfig safely updates the current configuration.
 func (d *Db) SetConfig(c Config) (err error) {
 	d.configLock.Lock()
 	defer d.configLock.Unlock()

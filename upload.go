@@ -14,7 +14,7 @@ import (
 	"github.com/unixpickle/1mage.us/imagedb"
 )
 
-var RateLimitErr = errors.New("rate limit exceeded")
+var ErrRateLimit = errors.New("rate limit exceeded")
 
 // An UploadResult is sent to clients whenever they use the upload API.
 type UploadResult struct {
@@ -71,11 +71,11 @@ func ServeUpload(w http.ResponseWriter, r *http.Request) {
 }
 
 func uploadImage(p *multipart.Part, req *http.Request) (*imagedb.Image, error) {
-	if RateLimitRequest(req) {
-		return nil, RateLimitErr
+	if rateLimitUpload(req) {
+		return nil, ErrRateLimit
 	}
 
-	// NOTE: we do not obtain the ShutdownLock here. That is because the uploader controls the speed
+	// NOTE: we do not obtain the ShutdownLock here because the uploader controls the speed
 	// of the upload and we don't want them to hold us back from shutting down.
 	reader := NewCappedReader(p)
 	tempFile, err := ioutil.TempFile(TemporaryDirectory, "upload_image")
@@ -108,4 +108,15 @@ func mimeTypeForPart(part *multipart.Part) string {
 		mimeType = "image/jpeg"
 	}
 	return mimeType
+}
+
+// rateLimitUpload should be called once per uploaded image.
+// This will return true if the requester has reached its rate limit.
+func rateLimitUpload(r *http.Request) bool {
+	if IsAuthenticated(r) {
+		return false
+	}
+	id := HTTPNamer.Name(r)
+	max := GlobalDb.Config().MaxUploadsPerHour
+	return -RateLimiter.Decrement(id) > max
 }

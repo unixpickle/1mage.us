@@ -7,17 +7,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 )
-
-// ShutdownLock should be locked for reading whenever the database is being modified.
-// When the app is shutting down, this will be locked for writing to block further changes.
-var ShutdownLock sync.RWMutex
-
-// TemporaryDirectory can be used in tasks like uploading files. It ensures that the file will be
-// deleted if the task terminates.
-var TemporaryDirectory string
 
 func main() {
 	if len(os.Args) != 3 {
